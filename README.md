@@ -1,0 +1,43 @@
+# 欢迎使用你的秒哒应用代码包
+秒哒应用链接
+    URL:https://www.miaoda.cn/projects/app-ayczbv8fl91d
+
+## 介绍
+
+项目介绍
+
+## 本地预览
+
+在项目根目录执行：
+
+```bash
+npm install
+npm run dev:local
+```
+
+启动后访问：`http://localhost:5173`
+
+如果想自动打开浏览器：
+
+```bash
+npm run dev:local:open
+```
+
+## 目录结构
+
+```txt
+├── README.md # 说明文档
+├── index.html # 入口文件
+├── package.json # 可以使用的package
+├── postcss.config.js # postcss 配置
+├── public # 静态资源目录
+│   ├── favicon.png # 图标
+│   └── images # 图片资源
+├── src # 源码目录
+│   ├── index.css # 全局样式
+│   ├── main.tsx # 项目入口文件
+├── tsconfig.app.json  # ts 前端配置文件
+├── tsconfig.json # ts 配置文件
+├── tsconfig.node.json # ts node端配置文件
+└── vite.config.ts # vite 配置文件
+```

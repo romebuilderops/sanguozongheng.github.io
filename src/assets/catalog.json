@@ -1,0 +1,176 @@
+{
+  "project": {
+    "name": "三国纵横·消战天下",
+    "version": "v1.0",
+    "source": "docs/prd.md"
+  },
+  "art_direction": {
+    "world_style": "国风+水墨+轻卡通",
+    "city_view": "俯视城池地图",
+    "battle_view": "2D三消棋盘",
+    "palette": {
+      "ui_gold": "#D8B35C",
+      "ui_ink": "#2D2A26",
+      "battle_red": "#D94A43",
+      "battle_green": "#5FAE5D",
+      "battle_yellow": "#D9B84A",
+      "battle_blue": "#4A7FD9",
+      "battle_purple": "#8E63D9",
+      "battle_orange": "#D98B3F"
+    }
+  },
+  "required_assets": {
+    "ui": [
+      {
+        "id": "logo_main",
+        "target_path": "images/ui/logo_main.png",
+        "description": "主菜单 Logo",
+        "status": "todo"
+      },
+      {
+        "id": "nav_bottom",
+        "target_path": "images/ui/nav_bottom.png",
+        "description": "底部导航底板（战役/将领/抽卡/商店/任务/好友）",
+        "status": "todo"
+      },
+      {
+        "id": "hud_bar_hp",
+        "target_path": "images/ui/hud_bar_hp.png",
+        "description": "战斗生命条底图",
+        "status": "todo"
+      },
+      {
+        "id": "hud_bar_energy",
+        "target_path": "images/ui/hud_bar_energy.png",
+        "description": "战斗能量条底图",
+        "status": "todo"
+      }
+    ],
+    "city": [
+      {
+        "id": "city_overview_map",
+        "target_path": "images/city/city_overview_map.jpg",
+        "description": "城池俯视主地图（支持缩放）",
+        "status": "todo"
+      },
+      {
+        "id": "building_main_hall",
+        "target_path": "images/city/buildings/main_hall.png",
+        "description": "主殿建筑图",
+        "status": "todo"
+      },
+      {
+        "id": "building_barracks",
+        "target_path": "images/city/buildings/barracks.png",
+        "description": "兵营建筑图",
+        "status": "todo"
+      },
+      {
+        "id": "building_training_ground",
+        "target_path": "images/city/buildings/training_ground.png",
+        "description": "校场建筑图",
+        "status": "todo"
+      },
+      {
+        "id": "building_market",
+        "target_path": "images/city/buildings/market.png",
+        "description": "市场建筑图",
+        "status": "todo"
+      },
+      {
+        "id": "building_workshop",
+        "target_path": "images/city/buildings/workshop.png",
+        "description": "工坊建筑图",
+        "status": "todo"
+      },
+      {
+        "id": "building_tavern",
+        "target_path": "images/city/buildings/tavern.png",
+        "description": "酒馆建筑图",
+        "status": "todo"
+      }
+    ],
+    "battle": [
+      {
+        "id": "battle_board_frame",
+        "target_path": "images/battle/board_frame_scroll.png",
+        "description": "8x8 棋盘竹简卷轴边框",
+        "status": "todo"
+      },
+      {
+        "id": "battle_bg_normal",
+        "target_path": "images/battle/backgrounds/battle_bg_normal.jpg",
+        "description": "普通战斗背景",
+        "status": "todo"
+      },
+      {
+        "id": "battle_bg_boss",
+        "target_path": "images/battle/backgrounds/battle_bg_boss.jpg",
+        "description": "BOSS 战背景",
+        "status": "todo"
+      }
+    ],
+    "gems": [
+      { "id": "gem_red_attack", "target_path": "images/gems/red_attack.png", "description": "红色攻击棋子", "status": "todo" },
+      { "id": "gem_green_heal", "target_path": "images/gems/green_heal.png", "description": "绿色生命棋子", "status": "todo" },
+      { "id": "gem_yellow_morale", "target_path": "images/gems/yellow_morale.png", "description": "黄色士气棋子", "status": "todo" },
+      { "id": "gem_blue_defense", "target_path": "images/gems/blue_defense.png", "description": "蓝色防御棋子", "status": "todo" },
+      { "id": "gem_purple_strategy", "target_path": "images/gems/purple_strategy.png", "description": "紫色谋略棋子", "status": "todo" },
+      { "id": "gem_orange_supply", "target_path": "images/gems/orange_supply.png", "description": "橙色粮草棋子", "status": "todo" },
+      { "id": "gem_enhanced", "target_path": "images/gems/special_enhanced.png", "description": "强化棋子", "status": "todo" },
+      { "id": "gem_bomb", "target_path": "images/gems/special_bomb.png", "description": "炸弹棋子", "status": "todo" },
+      { "id": "gem_cross", "target_path": "images/gems/special_cross.png", "description": "十字消除棋子", "status": "todo" }
+    ],
+    "characters": [
+      { "id": "lord_caocao", "target_path": "images/characters/lords/caocao.png", "description": "主公曹操立绘/头像", "status": "todo" },
+      { "id": "lord_liubei", "target_path": "images/characters/lords/liubei.png", "description": "主公刘备立绘/头像", "status": "todo" },
+      { "id": "lord_sunquan", "target_path": "images/characters/lords/sunquan.png", "description": "主公孙权立绘/头像", "status": "todo" },
+      { "id": "lord_dongzhuo", "target_path": "images/characters/lords/dongzhuo.png", "description": "主公董卓立绘/头像", "status": "todo" },
+      { "id": "hero_zhangfei", "target_path": "images/characters/heroes/zhangfei.png", "description": "副将张飞头像", "status": "todo" },
+      { "id": "hero_zhaoyun", "target_path": "images/characters/heroes/zhaoyun.png", "description": "副将赵云头像", "status": "todo" },
+      { "id": "hero_zhouyu", "target_path": "images/characters/heroes/zhouyu.png", "description": "副将周瑜头像", "status": "todo" },
+      { "id": "hero_zhugeliang", "target_path": "images/characters/heroes/zhugeliang.png", "description": "副将诸葛亮头像", "status": "todo" },
+      { "id": "hero_lvbu", "target_path": "images/characters/heroes/lvbu.png", "description": "副将吕布头像", "status": "todo" }
+    ],
+    "audio": {
+      "bgm": [
+        { "id": "bgm_city", "target_path": "audio/bgm/city.mp3", "description": "城池界面背景音乐", "status": "todo" },
+        { "id": "bgm_battle", "target_path": "audio/bgm/battle.mp3", "description": "战斗背景音乐", "status": "todo" },
+        { "id": "bgm_boss", "target_path": "audio/bgm/boss.mp3", "description": "BOSS 战背景音乐", "status": "todo" }
+      ],
+      "sfx": [
+        { "id": "sfx_eliminate", "target_path": "audio/sfx/eliminate.wav", "description": "消除音效", "status": "todo" },
+        { "id": "sfx_skill", "target_path": "audio/sfx/skill.wav", "description": "技能释放音效", "status": "todo" },
+        { "id": "sfx_upgrade", "target_path": "audio/sfx/upgrade.wav", "description": "升级成功音效", "status": "todo" },
+        { "id": "sfx_click", "target_path": "audio/sfx/click.wav", "description": "UI 点击音效", "status": "todo" }
+      ]
+    }
+  },
+  "downloadable_packs": [
+    {
+      "name": "sgz_ui_core",
+      "purpose": "国风 UI 框体与按钮基础包",
+      "status": "planned"
+    },
+    {
+      "name": "sgz_city_building_pack",
+      "purpose": "城池地图与建筑资源包",
+      "status": "planned"
+    },
+    {
+      "name": "sgz_match3_gems_pack",
+      "purpose": "三消棋子与特效基础包",
+      "status": "planned"
+    },
+    {
+      "name": "sgz_heroes_avatar_pack",
+      "purpose": "主公与副将头像包",
+      "status": "planned"
+    },
+    {
+      "name": "sgz_audio_base_pack",
+      "purpose": "BGM 与 SFX 基础音频包",
+      "status": "planned"
+    }
+  ]
+}
