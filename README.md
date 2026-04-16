@@ -1,6 +1,5 @@
-# 欢迎使用你的秒哒应用代码包
-秒哒应用链接
-    URL:https://www.miaoda.cn/projects/app-ayczbv8fl91d
+# vercel可访问链接
+sanguozongheng-github-io-git-fre-15e9fe-romebuilderops-projects.vercel.app
 
 ## 介绍
 
