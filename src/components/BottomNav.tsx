@@ -1,12 +1,13 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { Swords, Users, Dices, ShoppingCart } from 'lucide-react';
+import { Swords, Users, Dices, ShoppingCart, Backpack } from 'lucide-react';
 import clsx from 'clsx';
 
 const NAV_ITEMS = [
   { path: '/campaign', label: '战役', icon: Swords },
   { path: '/generals', label: '将领', icon: Users },
   { path: '/gacha', label: '抽卡', icon: Dices },
+  { path: '/bag', label: '背包', icon: Backpack },
   { path: '/shop', label: '商店', icon: ShoppingCart },
 ];
 

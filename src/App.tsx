@@ -7,6 +7,7 @@ import Combat from './pages/Combat';
 import Generals from './pages/Generals';
 import Gacha from './pages/Gacha';
 import Shop from './pages/Shop';
+import Bag from './pages/Bag';
 import Layout from './components/Layout';
 
 function App() {
@@ -23,6 +24,7 @@ function App() {
           <Route path="/generals" element={<Generals />} />
           <Route path="/gacha" element={<Gacha />} />
           <Route path="/shop" element={<Shop />} />
+          <Route path="/bag" element={<Bag />} />
         </Route>
       </Routes>
     </Router>
