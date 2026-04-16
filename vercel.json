@@ -1,4 +1,4 @@
 {
-  "buildCommand": "npm config set registry https://registry.npmjs.org/ && npm run build",
-  "installCommand": "npm config set registry https://registry.npmjs.org/ && npm install"
+  "installCommand": "npm config set registry https://registry.npmjs.org/ && npm install",
+  "buildCommand": "npm run build"
 }
