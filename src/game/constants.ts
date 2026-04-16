@@ -42,7 +42,7 @@ export const GENERALS: Record<string, General> = {
   lvbu: { id: 'lvbu', name: '吕布', camp: '群雄', rarity: '传说', baseAttack: 100, baseHp: 900, skillName: '乱世枭雄', skillCost: 80, skillDesc: '消除棋盘上所有同色棋子（玩家选择颜色），并对敌人造成相当于消除数量×5的伤害' },
   diaochan: { id: 'diaochan', name: '貂蝉', camp: '群雄', rarity: '传说', baseAttack: 70, baseHp: 800, skillName: '倾国倾城', skillCost: 40, skillDesc: '随机将8个紫色棋子变为黄色棋子，并使敌人下一回合攻击伤害降低30%' },
   zhangbao: { id: 'zhangbao', name: '张宝', camp: '群雄', rarity: '史诗', baseAttack: 75, baseHp: 850, skillName: '地公将军', skillCost: 45, skillDesc: '消除棋盘上所有绿色棋子，并对敌人造成相当于消除数量×3的伤害' },
-  zhangjiao_g: { id: 'zhangjiao_g', name: '张角', camp: '群雄', rarity: '传说', baseAttack: 95, baseHp: 1150, skillName: '太平要术', skillCost: 70, skillDesc: '将棋盘上所有黄色棋子变为强化棋子，并获得2层「黄天之力」' }
+  zhangjiao: { id: 'zhangjiao', name: '张角', camp: '群雄', rarity: '传说', baseAttack: 95, baseHp: 1150, skillName: '太平要术', skillCost: 70, skillDesc: '将棋盘上所有黄色棋子变为强化棋子，并获得2层「黄天之力」' }
 };
 
 // 道具列表
