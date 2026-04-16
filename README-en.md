@@ -1,8 +1,8 @@
-# Welcome to Your Miaoda Project
+# Three Kingdoms: Battle of Elimination
 
 ## Introduction
 
-Project Introduction
+Three Kingdoms: Battle of Elimination is a match-3 battle game set in the Three Kingdoms era.
 
 ## Directory Structure
 

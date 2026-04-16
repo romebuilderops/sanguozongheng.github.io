@@ -1,9 +1,8 @@
-# vercel可访问链接
-sanguozongheng-github-io-git-fre-15e9fe-romebuilderops-projects.vercel.app
+# 三国纵横·消战天下
 
 ## 介绍
 
-项目介绍
+三国纵横·消战天下是一款三国题材的三消对战游戏。
 
 ## 本地预览
 
