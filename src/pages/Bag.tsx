@@ -8,19 +8,9 @@ export default function Bag() {
   const { items, gainItem, useItem, addSilver, addWood } = useGameStore();
 
   const handleUse = (id: string) => {
-    if (id === 'stamina_potion') {
+    if (id === 'stamina_potion' || id === 'silver_bag' || id === 'wood_pack') {
       if (items[id] > 0) {
         useItem(id);
-      }
-    } else if (id === 'silver_bag') {
-      if (items[id] > 0) {
-        gainItem(id, -1);
-        addSilver(1000);
-      }
-    } else if (id === 'wood_pack') {
-      if (items[id] > 0) {
-        gainItem(id, -1);
-        addWood(500);
       }
     } else {
       alert('该物品无法直接使用');
