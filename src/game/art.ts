@@ -18,6 +18,12 @@ const CHARACTER_MARKS: Record<string, string> = {
   zhugeliang: "智",
   lvbu: "战",
   liubei_g: "德",
+  simayi: "忍",
+  guojia: "谋",
+  xiaoqiao: "琴",
+  diaochan: "美",
+  zhangbao: "地",
+  zhangjiao: "天",
 };
 
 export function getPortraitDataUri(id: string, name: string, camp: string): string {

@@ -1,12 +1,16 @@
 import React, { useState } from 'react';
 import { useGameStore } from '../store';
 import { GENERALS, LEADERS } from '../game/constants';
+import { getPortraitDataUri } from '../game/art';
 import clsx from 'clsx';
 import { Shield, Sword, Heart, Star, Users, ArrowUpCircle, PlusCircle } from 'lucide-react';
 
 export default function Generals() {
-  const { generals, leaderId, leaderLevel, currentGenerals, equipGeneral, upgradeGeneral, starUpGeneral, silver, wood } = useGameStore();
-  const leader = LEADERS[leaderId];
+  console.log('Generals component loaded');
+  const { generals = {}, leaderId = 'liubei', leaderLevel = 1, currentGenerals = [null, null], equipGeneral, upgradeGeneral, starUpGeneral, silver = 0, wood = 0 } = useGameStore() || {};
+  console.log('Store data:', { leaderId, leaderLevel, currentGenerals, silver, wood });
+  const leader = LEADERS[leaderId] || LEADERS.liubei;
+  console.log('Leader:', leader);
   const [selectedGeneral, setSelectedGeneral] = useState<string | null>(null);
 
   const getUpgradeCost = (level: number) => {
@@ -37,7 +41,7 @@ export default function Generals() {
             alt={leader.name}
             className="w-20 h-20 rounded-lg object-cover border border-amber-600 shadow-[0_0_12px_rgba(245,158,11,0.3)]"
             onError={(e) => {
-              (e.target as HTMLImageElement).src = `https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Three%20Kingdoms%20general%20${leader.name}%20portrait%20ink%20style&image_size=square`;
+              (e.target as HTMLImageElement).src = getPortraitDataUri(leader.id, leader.name, leader.camp);
             }}
           />
           <div className="flex-1">
@@ -85,7 +89,7 @@ export default function Generals() {
                     alt={staticG.name}
                     className="w-16 h-16 rounded-lg object-cover border border-slate-600 mb-2"
                     onError={(e) => {
-                      (e.target as HTMLImageElement).src = `https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Three%20Kingdoms%20general%20${staticG.name}%20portrait%20ink%20style&image_size=square`;
+                      (e.target as HTMLImageElement).src = getPortraitDataUri(staticG.id, staticG.name, staticG.camp);
                     }}
                   />
                   <div className="text-lg font-bold text-amber-500">{staticG.name}</div>
@@ -126,7 +130,7 @@ export default function Generals() {
                   alt={staticG.name}
                   className="w-full h-full object-cover"
                   onError={(e) => {
-                    (e.target as HTMLImageElement).src = `https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Three%20Kingdoms%20general%20${staticG.name}%20portrait%20ink%20style&image_size=square`;
+                    (e.target as HTMLImageElement).src = getPortraitDataUri(staticG.id, staticG.name, staticG.camp);
                   }}
                 />
                 <div className="absolute bottom-0 left-0 right-0 flex justify-center -mb-1">
