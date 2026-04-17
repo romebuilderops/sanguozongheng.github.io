@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Clear Local Storage</title>
+</head>
+<body>
+    <h1>Clear Local Storage</h1>
+    <button onclick="clearStorage()">Clear Game Storage</button>
+    <div id="status"></div>
+
+    <script>
+        function clearStorage() {
+            localStorage.removeItem('game-storage');
+            document.getElementById('status').innerText = 'Local storage cleared! Please refresh the game.';
+            console.log('Local storage cleared');
+        }
+    </script>
+</body>
+</html>
