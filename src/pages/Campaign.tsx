@@ -15,16 +15,14 @@ export default function Campaign() {
   const levelIds = chapter ? Array.from({ length: chapter.levelCount }, (_, i) => `chapter_${selectedChapter}_${i + 1}`) : [];
 
   const handleStartBattle = (levelId: string) => {
-    const level = levels[levelId];
-    // 检查关卡是否存在，或者是否是第一章第一关
-    const isFirstLevel = levelId === 'chapter_0_1';
-    if (!level && !isFirstLevel) {
-      alert('关卡未解锁');
-      return;
-    }
-    // 检查关卡是否解锁
-    if (level && !level.isUnlocked) {
-      alert('关卡未解锁');
+    // 检查关卡是否存在
+    const levelParts = levelId.split('_');
+    const chapterIndex = parseInt(levelParts[1]) || 0;
+    const levelIndex = parseInt(levelParts[2]) || 1;
+    const chapter = CHAPTERS[chapterIndex];
+    
+    if (!chapter || levelIndex > chapter.levelCount) {
+      alert('关卡敬请期待');
       return;
     }
     
@@ -40,7 +38,7 @@ export default function Campaign() {
     // 特殊关卡设置
     if (index === 4) return '精英'; // 第5关（索引4）是张宝精英关
     if (index === 9) return 'BOSS';  // 第10关（索引9）是张角BOSS关
-    if (index >= 10) return '敬请期待'; // 第10关以后是敬请期待
+    if (index >= levelCount) return '敬请期待'; // 超过章节关卡数量的是敬请期待
     return '普通';
   };
 
@@ -98,15 +96,15 @@ export default function Campaign() {
           {levelIds.map((levelId, idx) => {
             const levelType = getLevelType(idx, chapter!.levelCount);
             const chapterIndex = selectedChapter;
-            // 检查是否是第10关以后的关卡
-            const isFutureLevel = idx >= 10;
+            // 检查是否超过章节关卡数量
+            const isFutureLevel = idx >= chapter.levelCount;
             const prevLevelId = `chapter_${chapterIndex}_${idx}`;
             const level = levels[levelId] || { 
               id: levelId, 
               chapter: chapterIndex, 
               index: idx + 1, 
               type: levelType, 
-              isUnlocked: !isFutureLevel && (idx === 0 || levels[prevLevelId]?.isPassed),
+              isUnlocked: !isFutureLevel,
               isPassed: false, 
               stars: 0 
             };

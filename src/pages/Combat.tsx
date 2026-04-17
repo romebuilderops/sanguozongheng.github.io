@@ -16,22 +16,22 @@ export default function Combat() {
   const { levelId } = location.state || { levelId: '1-1' };
   const initialized = useRef(false);
   
-  const { leaderId, leaderLevel, currentGenerals, completeLevel } = useGameStore();
+  const { leaderId, leaderLevel, currentGenerals, generals, completeLevel } = useGameStore();
   const combatState = useCombatStore();
   
   const leader = LEADERS[leaderId];
-  const g1 = currentGenerals[0] ? GENERALS[currentGenerals[0]] : null;
-  const g2 = currentGenerals[1] ? GENERALS[currentGenerals[1]] : null;
+  const g1 = currentGenerals[0] && generals[currentGenerals[0]] ? GENERALS[generals[currentGenerals[0]].generalId] : null;
+  const g2 = currentGenerals[1] && generals[currentGenerals[1]] ? GENERALS[generals[currentGenerals[1]].generalId] : null;
 
   // 初始化战斗数据
   useEffect(() => {
     const levelInfo = useGameStore.getState().levels[levelId];
     const isBoss = levelInfo?.type === 'BOSS';
     
-    const { leaderId, leaderLevel, currentGenerals } = useGameStore.getState();
+    const { leaderId, leaderLevel, currentGenerals, generals } = useGameStore.getState();
     const leaderData = LEADERS[leaderId];
-    const gen1Data = currentGenerals[0] ? GENERALS[currentGenerals[0]] : null;
-    const gen2Data = currentGenerals[1] ? GENERALS[currentGenerals[1]] : null;
+    const gen1Data = currentGenerals[0] && generals[currentGenerals[0]] ? GENERALS[generals[currentGenerals[0]].generalId] : null;
+    const gen2Data = currentGenerals[1] && generals[currentGenerals[1]] ? GENERALS[generals[currentGenerals[1]].generalId] : null;
 
     // 从levelId中提取关卡索引
     const levelParts = levelId.split('_');
@@ -52,26 +52,26 @@ export default function Combat() {
     if (levelIndex === 5) {
       enemyHp = enemyHp * 1.5;
       enemyDmg = enemyDmg * 1.3;
-      enemyName = '张宝（精英）';
+      enemyName = '魔张宝（精英）';
     }
     
-    // BOSS关调整
-    if (isBoss) {
+    // BOSS关调整（第10关或levelInfo.type为BOSS）
+    if (isBoss || levelIndex === 10) {
       enemyHp = enemyHp * 2;
       enemyDmg = enemyDmg * 1.5;
-      enemyName = '张角（BOSS）';
+      enemyName = '魔张角（BOSS）';
     }
     
     useCombatStore.getState().initCombat({
-      playerMaxHp: Math.floor(leaderData.baseHp * Math.pow(leaderLevel, 1.2)),
-      playerHp: Math.floor(leaderData.baseHp * Math.pow(leaderLevel, 1.2)),
+      playerMaxHp: Math.floor(leaderData.baseHp * (1 + (leaderLevel - 1) * 0.1)),
+      playerHp: Math.floor(leaderData.baseHp * (1 + (leaderLevel - 1) * 0.1)),
       enemyName: enemyName,
       enemyMaxHp: enemyHp,
       enemyHp: enemyHp,
       enemyNextDmg: enemyDmg,
-      general1: currentGenerals[0],
+      general1: gen1Data ? gen1Data.id : null,
       general1MaxEnergy: gen1Data ? gen1Data.skillCost : 0,
-      general2: currentGenerals[1],
+      general2: gen2Data ? gen2Data.id : null,
       general2MaxEnergy: gen2Data ? gen2Data.skillCost : 0,
     });
   }, [levelId]);
@@ -106,12 +106,12 @@ export default function Combat() {
       const state = useCombatStore.getState();
       if (state.isGameOver) return;
       
-      const { leaderLevel, leaderId, currentGenerals } = useGameStore.getState();
+      const { leaderLevel, leaderId, currentGenerals, generals } = useGameStore.getState();
       const leaderData = LEADERS[leaderId];
-      const gen1Data = currentGenerals[0] ? GENERALS[currentGenerals[0]] : null;
-      const gen2Data = currentGenerals[1] ? GENERALS[currentGenerals[1]] : null;
+      const gen1Data = currentGenerals[0] && generals[currentGenerals[0]] ? GENERALS[generals[currentGenerals[0]].generalId] : null;
+      const gen2Data = currentGenerals[1] && generals[currentGenerals[1]] ? GENERALS[generals[currentGenerals[1]].generalId] : null;
 
-      const baseAtk = leaderData.baseAttack * Math.pow(leaderLevel, 1.2) + 
+      const baseAtk = leaderData.baseAttack * (1 + (leaderLevel - 1) * 0.1) + 
         (gen1Data ? gen1Data.baseAttack : 0) * 0.3 + 
         (gen2Data ? gen2Data.baseAttack : 0) * 0.3;
 
@@ -140,25 +140,137 @@ export default function Combat() {
       if (totalEnergy > 0) state.addEnergy(totalEnergy, state.playerMaxEnergy);
     };
 
-    const onEnemyTurn = () => {
+    const onHealPlayer = ({ percentage }: { percentage: number }) => {
       const state = useCombatStore.getState();
       if (state.isGameOver) return;
       
-      let dmg = state.enemyNextDmg;
+      const healAmount = state.playerMaxHp * (percentage / 100);
+      state.setPlayerHp(state.playerHp + healAmount);
+    };
+
+    const onEnemyAttack = ({ damage, energyLoss, energyReduction }: { damage: number, energyLoss?: number, energyReduction?: number }) => {
+      const state = useCombatStore.getState();
+      if (state.isGameOver) return;
+      
+      // 处理伤害
+      let dmg = damage;
       if (state.playerShields > 0) {
         dmg = dmg * 0.9; // 1层护盾减伤 10%
         useCombatStore.setState({ playerShields: state.playerShields - 1 });
       }
-      
       state.setPlayerHp(state.playerHp - dmg);
+      
+      // 处理能量损失
+      if (energyLoss) {
+        useCombatStore.setState({ playerEnergy: Math.max(0, state.playerEnergy - energyLoss) });
+      }
+      
+      // 处理能量减少效果
+      if (energyReduction) {
+        // 这里可以添加能量减少的逻辑
+      }
+    };
+
+    const onEnemyHeal = ({ percentage }: { percentage: number }) => {
+      const state = useCombatStore.getState();
+      if (state.isGameOver) return;
+      
+      const healAmount = state.enemyMaxHp * (percentage / 100);
+      state.setEnemyHp(state.enemyHp + healAmount);
+    };
+
+    const onAddBuff = ({ buff, stacks }: { buff: string, stacks: number }) => {
+      // 处理敌人获得的 buff
+      console.log(`Enemy gained ${stacks} stacks of ${buff}`);
+    };
+
+    const onEnemyTurn = () => {
+      const state = useCombatStore.getState();
+      if (state.isGameOver) return;
+      
+      // 增加回合计数
+      state.incrementTurn();
+      
+      // 敌人技能触发逻辑
+      if (state.enemyName === '魔张宝（精英）') {
+        const hpPercentage = state.enemyHp / state.enemyMaxHp;
+        
+        // 普通攻击逻辑
+        if (hpPercentage > 0.6 || state.turnCount % 2 === 0) {
+          // 普通攻击
+          let dmg = state.enemyNextDmg;
+          if (state.playerShields > 0) {
+            dmg = dmg * 0.9; // 1层护盾减伤 10%
+            useCombatStore.setState({ playerShields: state.playerShields - 1 });
+          }
+          state.setPlayerHp(state.playerHp - dmg);
+        }
+        
+        // 妖术技能触发
+        if ((hpPercentage > 0.6 && state.turnCount % 4 === 0) ||
+            (hpPercentage <= 0.6 && hpPercentage > 0.4 && state.turnCount % 3 === 0) ||
+            (hpPercentage <= 0.4 && state.turnCount % 2 === 0)) {
+          EventBus.emit('cast-skill', '魔·妖术');
+        }
+        
+        // 地公将军技能触发
+        if (hpPercentage <= 0.4 && Math.random() < 0.5) {
+          EventBus.emit('cast-skill', '魔·地公将军');
+        }
+      } else if (state.enemyName === '魔张角（BOSS）') {
+        const hpPercentage = state.enemyHp / state.enemyMaxHp;
+        
+        // 普通攻击逻辑
+        if (hpPercentage > 0.7 || state.turnCount % 2 === 0) {
+          // 普通攻击
+          let dmg = state.enemyNextDmg;
+          if (state.playerShields > 0) {
+            dmg = dmg * 0.9; // 1层护盾减伤 10%
+            useCombatStore.setState({ playerShields: state.playerShields - 1 });
+          }
+          state.setPlayerHp(state.playerHp - dmg);
+        }
+        
+        // 妖术技能触发
+        if ((hpPercentage > 0.5 && state.turnCount % 3 === 0) ||
+            (hpPercentage <= 0.5 && state.turnCount % 2 === 0)) {
+          EventBus.emit('cast-skill', '魔·妖术');
+        }
+        
+        // 天公将军技能触发
+        if (hpPercentage <= 0.5 && state.turnCount % 2 === 0) {
+          EventBus.emit('cast-skill', '魔·天公将军');
+        }
+        
+        // 黄天当立技能触发
+        if (hpPercentage <= 0.2) {
+          EventBus.emit('cast-skill', '魔·黄天当立');
+        }
+      } else {
+        // 普通敌人的普通攻击
+        let dmg = state.enemyNextDmg;
+        if (state.playerShields > 0) {
+          dmg = dmg * 0.9; // 1层护盾减伤 10%
+          useCombatStore.setState({ playerShields: state.playerShields - 1 });
+        }
+        state.setPlayerHp(state.playerHp - dmg);
+      }
     };
 
     EventBus.on('gems-matched', onGemsMatched);
     EventBus.on('enemy-turn', onEnemyTurn);
+    EventBus.on('heal-player', onHealPlayer);
+    EventBus.on('enemy-attack', onEnemyAttack);
+    EventBus.on('enemy-heal', onEnemyHeal);
+    EventBus.on('add-buff', onAddBuff);
     
     return () => {
       EventBus.off('gems-matched', onGemsMatched);
       EventBus.off('enemy-turn', onEnemyTurn);
+      EventBus.off('heal-player', onHealPlayer);
+      EventBus.off('enemy-attack', onEnemyAttack);
+      EventBus.off('enemy-heal', onEnemyHeal);
+      EventBus.off('add-buff', onAddBuff);
     };
   }, []);
 

@@ -11,11 +11,11 @@ export default function MainMenu() {
   return (
     <div className="h-screen w-full flex flex-col items-center justify-center bg-slate-950 relative overflow-hidden">
       <div className="absolute inset-0 bg-black/60"></div>
+      <div className="absolute inset-0 bg-[url('/images/cover.png')] bg-cover bg-center opacity-40"></div>
+      <div className="absolute inset-0 bg-gradient-to-b from-amber-900/30 via-slate-900/50 to-slate-950/90"></div>
       
       <div className="relative z-10 flex flex-col items-center">
-        <h1 className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-b from-amber-200 to-amber-600 drop-shadow-[0_4px_4px_rgba(0,0,0,0.8)] tracking-widest mb-16 text-center leading-tight">
-          三国纵横<br/><span className="text-4xl text-rose-500">消战天下</span>
-        </h1>
+        <div className="h-80"></div>
         
         <div className="flex flex-col gap-6 w-64">
           <button 

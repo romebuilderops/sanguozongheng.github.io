@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { Swords, Users, Dices, ShoppingCart, Backpack } from 'lucide-react';
+import { Swords, Users, Dices, ShoppingCart, Backpack, BookOpen } from 'lucide-react';
 import clsx from 'clsx';
 
 const NAV_ITEMS = [
@@ -9,6 +9,7 @@ const NAV_ITEMS = [
   { path: '/gacha', label: '抽卡', icon: Dices },
   { path: '/bag', label: '背包', icon: Backpack },
   { path: '/shop', label: '商店', icon: ShoppingCart },
+  { path: '/help', label: '帮助', icon: BookOpen },
 ];
 
 

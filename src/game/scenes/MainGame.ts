@@ -25,6 +25,7 @@ export class MainGame extends Scene {
   private combo: number = 0;
   private skillEnergy: number = 0;
   private skillQueue: string[] = [];
+  private processingTimeout: Phaser.Time.TimerEvent | null = null;
 
   constructor() {
     super('MainGame');
@@ -91,7 +92,23 @@ export class MainGame extends Scene {
   }
 
   private onPointerDown(pointer: Phaser.Input.Pointer) {
-    if (this.isProcessing) return;
+    if (this.isProcessing) {
+      // 如果卡住超过5秒，自动解除
+      if (!this.processingTimeout) {
+        this.processingTimeout = this.time.delayedCall(5000, () => {
+          console.warn('Processing timeout - forcing isProcessing = false');
+          this.isProcessing = false;
+          this.processingTimeout = null;
+        });
+      }
+      return;
+    }
+    
+    // 取消之前的超时
+    if (this.processingTimeout) {
+      this.processingTimeout.remove();
+      this.processingTimeout = null;
+    }
 
     const c = Math.floor((pointer.x - OFFSET_X) / TILE_SIZE);
     const r = Math.floor((pointer.y + TILE_SIZE/2 - OFFSET_Y) / TILE_SIZE);
@@ -100,17 +117,44 @@ export class MainGame extends Scene {
       const clickedGem = this.grid[r][c]!;
       
       if (!this.selectedGem) {
+        // 如果是被虚化的棋子，可以选中但标记为虚化状态
+        if ((clickedGem as any).isCursed) {
+          clickedGem.sprite.setAlpha(0.5); // 虚化的棋子选中时显示不同的透明度
+          (clickedGem as any).isSelectedWhileCursed = true;
+        }
         this.selectedGem = clickedGem;
         this.selectedGem.sprite.setAlpha(0.5);
       } else {
+        // 检查是否尝试与虚化的棋子交换
+        const isTargetCursed = (clickedGem as any).isCursed;
+        const isSourceCursed = (this.selectedGem as any).isSelectedWhileCursed;
+        
+        if (isTargetCursed || isSourceCursed) {
+          // 虚化的棋子不能交换，取消选中状态
+          if ((this.selectedGem as any).isSelectedWhileCursed) {
+            (this.selectedGem as any).isSelectedWhileCursed = false;
+          }
+          this.selectedGem.sprite.setAlpha(1);
+          this.selectedGem = null;
+          return;
+        }
+        
         const dx = Math.abs(this.selectedGem.x - c);
         const dy = Math.abs(this.selectedGem.y - r);
         
         if ((dx === 1 && dy === 0) || (dx === 0 && dy === 1)) {
           this.swapGems(this.selectedGem, clickedGem);
         } else {
+          // 取消之前的虚化标记
+          if ((this.selectedGem as any).isSelectedWhileCursed) {
+            (this.selectedGem as any).isSelectedWhileCursed = false;
+          }
           this.selectedGem.sprite.setAlpha(1);
           this.selectedGem = clickedGem;
+          // 如果是虚化的棋子，标记为选中状态
+          if ((clickedGem as any).isCursed) {
+            (clickedGem as any).isSelectedWhileCursed = true;
+          }
           this.selectedGem.sprite.setAlpha(0.5);
         }
       }
@@ -146,6 +190,7 @@ export class MainGame extends Scene {
         const { matches, specialGems } = this.findMatches();
         if (matches.length > 0) {
           this.combo = 0;
+          this.removeCurseEffects(); // 玩家成功移动后解除虚化效果
           this.processMatches({ matches, specialGems });
         } else {
           // 还原
@@ -614,6 +659,17 @@ export class MainGame extends Scene {
     }
   }
 
+  // 解除所有被妖术影响的棋子
+  private removeCurseEffects() {
+    this.grid.forEach(row => row.forEach(g => {
+      if (g && (g as any).isCursed) {
+        g.sprite.setAlpha(1); // 恢复透明度
+        g.sprite.input.enabled = true; // 恢复交互
+        (g as any).isCursed = false; // 移除标记
+      }
+    }));
+  }
+
   // 技能处理
   private handleSkill(skillName: string) {
     if (this.isProcessing) {
@@ -648,6 +704,8 @@ export class MainGame extends Scene {
       toDestroy = reds.slice(0, 15);
     } else if (skillName === '八卦阵') {
       this.reshuffle();
+      // 为所有友军回复10%生命
+      EventBus.emit('heal-player', { percentage: 10 });
       this.isProcessing = false;
       return;
     } else if (skillName === '乱世枭雄') {
@@ -725,24 +783,133 @@ export class MainGame extends Scene {
         }
       });
       return;
-    } else if (skillName === '地公将军') {
-      // 消除棋盘上所有绿色棋子
-      this.grid.forEach(row => row.forEach(g => {
-        if (g && g.type === GEM_TYPES.GREEN) {
-          toDestroy.push(g);
-        }
-      }));
     } else if (skillName === '太平要术') {
-      // 将棋盘上所有黄色棋子变为强化棋子
+      // 将棋盘上所有黄色棋子变为强化棋子，并获得2层「黄天之力」
+      const yellows: GemData[] = [];
       this.grid.forEach(row => row.forEach(g => {
         if (g && g.type === GEM_TYPES.YELLOW) {
-          g.sprite.destroy();
-          this.createGem(g.y, g.x, g.type, 'enhance');
+          yellows.push(g);
         }
       }));
-      this.isProcessing = false;
+      
+      if (yellows.length > 0) {
+        // 先添加视觉反馈（缩放动画）
+        yellows.forEach(g => {
+          this.tweens.add({
+            targets: g.sprite,
+            scaleX: 1.3,
+            scaleY: 1.3,
+            duration: 150,
+            yoyo: true,
+            onComplete: () => {
+              // 动画完成后转换为强化棋子
+              g.sprite.destroy();
+              this.createGem(g.y, g.x, g.type, 'enhance');
+            }
+          });
+        });
+        
+        // 延迟触发强化效果爆炸
+        this.time.delayedCall(200, () => {
+          yellows.forEach(g => {
+            const enhanced = this.grid[g.y][g.x];
+            if (enhanced && enhanced.special === 'enhance') {
+              this.tweens.add({
+                targets: enhanced.sprite,
+                scaleX: 1.5,
+                scaleY: 1.5,
+                alpha: 0.5,
+                duration: 100,
+                yoyo: true,
+                onComplete: () => {
+                  enhanced.sprite.setScale(1);
+                  enhanced.sprite.setAlpha(1);
+                }
+              });
+            }
+          });
+          // 立即触发强化效果
+          this.time.delayedCall(100, () => {
+            const allGems: GemData[] = [];
+            this.grid.forEach(row => row.forEach(g => { if (g) allGems.push(g); }));
+            allGems.forEach(g => {
+              if (g.special === 'enhance') {
+                this.processSpecialGem(g);
+              }
+            });
+            this.time.delayedCall(300, () => {
+              this.isProcessing = false;
+            });
+          });
+        });
+      } else {
+        this.isProcessing = false;
+      }
       return;
-    }
+    } else if (skillName === '地公将军') {
+      // 消除棋盘上所有绿色棋子，并对敌人造成相当于消除数量×3的伤害
+      const greens: GemData[] = [];
+      this.grid.forEach(row => row.forEach(g => { if (g && g.type === GEM_TYPES.GREEN) greens.push(g); }));
+      const greenCount = greens.length;
+      // 实际消除绿色棋子
+      greens.forEach(g => {
+        g.sprite.destroy();
+        this.grid[g.y][g.x] = null;
+      });
+      // 触发绿色棋子的消除效果
+      if (greenCount > 0) {
+        const typeCount: Record<number, number> = {};
+        typeCount[GEM_TYPES.GREEN] = greenCount;
+        EventBus.emit('gems-matched', { typeCount, combo: 1 });
+      }
+      // 填充新棋子
+      this.time.delayedCall(100, () => {
+        this.applyGravity([]);
+        this.isProcessing = false;
+      });
+      return;
+    } else if (skillName === '魔·地公将军') {
+          // 当生命值低于40%时，每回合有50%概率释放，对玩家造成150点伤害并随机消除玩家5点能量
+          EventBus.emit('enemy-attack', { damage: 150, energyLoss: 5 });
+          this.isProcessing = false;
+          return;
+      } else if (skillName === '魔·妖术') {
+          // 每3回合释放，将棋盘上3个随机棋子变为黑色棋子（无法消除，持续1回合）
+          const gems: GemData[] = [];
+          this.grid.forEach(row => row.forEach(g => { if (g) gems.push(g); }));
+          Phaser.Math.RND.shuffle(gems);
+          const selected = gems.slice(0, 3);
+          // 保存原始状态
+          const originalStates = selected.map(g => ({
+            gem: g,
+            alpha: g.sprite.alpha,
+            interactive: g.sprite.input.enabled
+          }));
+          // 将棋子标暗并禁用交互
+          selected.forEach(g => {
+            g.sprite.setAlpha(0.3); // 标暗
+            g.sprite.input.enabled = false; // 禁用交互
+          });
+          // 标记这些棋子为被妖术影响
+          selected.forEach(g => {
+            (g as any).isCursed = true;
+          });
+          // 不自动解除，等到玩家移动棋子或回合结束时解除
+          // 注意：在玩家移动棋子的逻辑中需要检查并解除这些棋子的状态
+          this.isProcessing = false;
+          return;
+      } else if (skillName === '魔·天公将军') {
+          // 当生命值低于50%时，每2回合释放，对玩家造成200点伤害并使玩家下回合消除棋子获得的能量减少50%
+          EventBus.emit('enemy-attack', { damage: 200, energyReduction: 50 });
+          this.isProcessing = false;
+          return;
+      } else if (skillName === '魔·黄天当立') {
+          // 当生命值低于20%时，每回合释放，回复自身10%最大生命值并对玩家造成150点伤害
+          EventBus.emit('enemy-heal', { percentage: 10 });
+          EventBus.emit('enemy-attack', { damage: 150 });
+          this.isProcessing = false;
+          return;
+      }
 
     if (toDestroy.length > 0) {
       this.combo = 0;

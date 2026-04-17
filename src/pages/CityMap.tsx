@@ -1,8 +1,9 @@
 import React, { useState, useRef } from 'react';
 import { useGameStore } from '../store';
+import { LEADERS, GAME_CONSTANTS } from '../game/constants';
 import { Building as BuildingType } from '../types';
 import clsx from 'clsx';
-import { X, ArrowUpCircle, Coins, TreePine, Users, Sword, Shield, Star } from 'lucide-react';
+import { X, ArrowUpCircle, Coins, TreePine, Users, Sword, Shield, Star, Crown } from 'lucide-react';
 
 const BUILDING_POSITIONS = {
   hall: { top: '20%', left: '45%' },
@@ -41,7 +42,7 @@ const BUILDING_EFFECTS = {
 };
 
 export default function CityMap() {
-  const { buildings, silver, wood, upgradeBuilding } = useGameStore();
+  const { buildings, silver, wood, upgradeBuilding, leaderId, leaderLevel, leaderExp, upgradeLeader, addLeaderExp } = useGameStore();
   const [selectedBuilding, setSelectedBuilding] = useState<string | null>(null);
   const mapRef = useRef<HTMLDivElement>(null);
   
@@ -55,6 +56,10 @@ export default function CityMap() {
   const costSilver = selectedData ? Math.floor(selectedData.level * 500 * Math.pow(1.2, selectedData.level - 1)) : 0;
   const costWood = selectedData ? Math.floor(selectedData.level * 300 * Math.pow(1.2, selectedData.level - 1)) : 0;
   const canUpgrade = selectedData && silver >= costSilver && wood >= costWood;
+
+  const leader = LEADERS[leaderId];
+  const requiredWood = leaderLevel * 100;
+  const canUpgradeLeader = wood >= requiredWood;
 
   const getBuildingIcon = (buildingId: string) => {
     switch (buildingId) {

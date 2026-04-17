@@ -20,6 +20,8 @@ export interface CombatState {
   general2Energy: number;
   general2MaxEnergy: number;
 
+  turnCount: number;
+
   isGameOver: boolean;
   result: 'win' | 'lose' | null;
 
@@ -32,6 +34,7 @@ export interface CombatState {
   addGeneralEnergy: (g1Val: number, g2Val: number) => void;
   consumeGeneralEnergy: (index: 1 | 2, val: number) => void;
   setGameOver: (result: 'win' | 'lose') => void;
+  incrementTurn: () => void;
 }
 
 export const useCombatStore = create<CombatState>()(
@@ -55,10 +58,12 @@ export const useCombatStore = create<CombatState>()(
     general2Energy: 0,
     general2MaxEnergy: 50,
 
+    turnCount: 0,
+
     isGameOver: false,
     result: null,
 
-    initCombat: (data) => set({ ...data, isGameOver: false, result: null, general1Energy: 0, general2Energy: 0 }),
+    initCombat: (data) => set({ ...data, isGameOver: false, result: null, general1Energy: 0, general2Energy: 0, turnCount: 0 }),
     
     setPlayerHp: (hp) => set(state => ({ 
       playerHp: Math.max(0, Math.min(state.playerMaxHp, hp)),
@@ -93,5 +98,7 @@ export const useCombatStore = create<CombatState>()(
     }),
 
     setGameOver: (result) => set({ isGameOver: true, result }),
+
+    incrementTurn: () => set(state => ({ turnCount: state.turnCount + 1 })),
   })
 );

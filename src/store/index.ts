@@ -50,7 +50,7 @@ interface GameState {
   gainGeneral: (id: string) => void;
   upgradeGeneral: (id: string) => boolean;
   starUpGeneral: (id: string) => boolean;
-  equipGeneral: (index: 0 | 1, generalId: string | null) => void;
+  equipGeneral: (index: number, generalId: string | null) => void;
   
   // 道具操作
   gainItem: (id: string, amount: number) => void;
@@ -146,25 +146,22 @@ export const useGameStore = create<GameState>()(
       },
 
       // 主公升级
-      upgradeLeader: () => set((state) => ({
-        leaderLevel: state.leaderLevel + 1,
-        maxStamina: Math.min(GAME_CONSTANTS.MAX_STAMINA, state.maxStamina + 2),
-        leaderExp: 0
-      })),
-
-      // 增加主公经验
-      addLeaderExp: (exp) => set((state) => {
-        const newExp = state.leaderExp + exp;
-        const requiredExp = Math.floor(100 * Math.pow(state.leaderLevel, 1.2));
-        if (newExp >= requiredExp) {
+      upgradeLeader: () => set((state) => {
+        const requiredWood = state.leaderLevel * 100;
+        if (state.wood >= requiredWood) {
           return {
             leaderLevel: state.leaderLevel + 1,
             maxStamina: Math.min(GAME_CONSTANTS.MAX_STAMINA, state.maxStamina + 2),
-            leaderExp: newExp - requiredExp
+            wood: state.wood - requiredWood
           };
         }
-        return { leaderExp: newExp };
+        return state;
       }),
+
+      // 增加主公经验（保留用于其他地方）
+      addLeaderExp: (exp) => set((state) => ({
+        leaderExp: state.leaderExp + exp
+      })),
 
       // 选择主公
       selectLeader: (leaderId) => set(() => ({
@@ -260,8 +257,10 @@ export const useGameStore = create<GameState>()(
 
       // 装备将领
       equipGeneral: (index, generalId) => set((state) => {
+        console.log('equipGeneral called:', { index, generalId, currentGenerals: state.currentGenerals });
         const newGens = [...state.currentGenerals] as [string | null, string | null];
         newGens[index] = generalId;
+        console.log('After equipGeneral:', { newGens });
         return { currentGenerals: newGens };
       }),
 
